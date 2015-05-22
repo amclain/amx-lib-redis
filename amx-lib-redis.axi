@@ -1,5 +1,6 @@
 (***********************************************************
     amx-lib-redis
+    v0.1.0
     
     A Redis database client for AMX's NetLinx programming language.
     
@@ -70,16 +71,23 @@ DEFINE_VARIABLE
 (*         SUBROUTINE/FUNCTION DEFINITIONS GO BELOW        *)
 (***********************************************************)
 
-define_function redis_connect()
+/*
+ *  Connect to a Redis server.
+ *  port can be set to REDIS_DEFAULT_PORT.
+ */
+define_function integer redis_connect(dev socket, char ip[], integer port)
 {
-    // TODO: Implement
+    ip_client_open(socket.port, ip, port, IP_TCP);
+    
+    // TODO: Error handling.
+    return REDIS_SUCCESS;
 }
 
 /*
  *  Get the value of a key.
  *  http://redis.io/commands/get
  */
-define_function redis_get(dev socket, char key[])
+define_function integer redis_get(dev socket, char key[])
 {
     send_string socket, "
         '*2', $0D, $0A,
@@ -88,13 +96,16 @@ define_function redis_get(dev socket, char key[])
         '$', itoa(length_string(key)), $0D, $0A,
         key, $0D, $0A
     ";
+    
+    // TODO: Error handling.
+    return REDIS_SUCCESS;
 }
 
 /*
  *  Set the string value of a key.
  *  http://redis.io/commands/set
  */
-define_function redis_set(dev socket, char key[], char value[])
+define_function integer redis_set(dev socket, char key[], char value[])
 {
     send_string socket, "
         '*3', $0D, $0A,
@@ -105,6 +116,9 @@ define_function redis_set(dev socket, char key[], char value[])
         '$', itoa(length_string(value)), $0D, $0A,
         value, $0D, $0A
     ";
+    
+    // TODO: Error handling.
+    return REDIS_SUCCESS;
 }
 
 /*

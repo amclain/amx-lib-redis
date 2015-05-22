@@ -372,12 +372,8 @@ data_event[vdvRPC]
             FILE: '../amx-lib-redis.axi'
         /------------------------------------------------------------------*/
 
-        if(compare_string(f_name, 'redis_connect'))
-        {
-            print(LOG_LEVEL_INFO, 'RPC: redis_connect()');
-            
-            redis_connect();
-        }
+        // Skipped:
+        // redis_connect(dev socket, char ip[], integer port)
 
         // Skipped:
         // redis_get(dev socket, char key[])

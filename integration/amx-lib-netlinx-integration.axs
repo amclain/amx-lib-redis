@@ -10,17 +10,20 @@ dvREDIS = 0:2:0;
 dvDEBUG = 34500:1:0;
 
 (***********************************************************)
-(*              CONSTANT DEFINITIONS GO BELOW              *)
-(***********************************************************)
-DEFINE_CONSTANT
-
-(***********************************************************)
 (*                    INCLUDES GO BELOW                    *)
 (***********************************************************)
 
 #include 'amx-lib-log'
 #include 'amx-lib-volume-sc'
 #include 'amx-lib-redis'
+
+(***********************************************************)
+(*              CONSTANT DEFINITIONS GO BELOW              *)
+(***********************************************************)
+DEFINE_CONSTANT
+
+REDIS_IP = '10.0.11.63';
+REDIS_PORT = REDIS_DEFAULT_PORT;
 
 (***********************************************************)
 (*              VARIABLE DEFINITIONS GO BELOW              *)
@@ -39,6 +42,7 @@ volatile char key[255];
 DEFINE_START
 
 key = 'netlinx';
+
 logSetLevel(LOG_LEVEL_DEBUG);
 
 (***********************************************************)
@@ -50,7 +54,7 @@ button_event[dvDEBUG, 1]
 {
     push:
     {
-        ip_client_open(2, '10.0.11.63', REDIS_DEFAULT_PORT, IP_TCP);
+        redis_connect(dvREDIS, REDIS_IP, REDIS_PORT);
         print(LOG_LEVEL_INFO, 'opened socket');
     }
     
