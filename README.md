@@ -1,4 +1,5 @@
-netlinx-redis
+amx-lib-redis
 =============
 
-A [Redis](http://redis.io/) database client for NetLinx.
+A [Redis](http://redis.io/) database client for AMX's NetLinx programming
+language.
