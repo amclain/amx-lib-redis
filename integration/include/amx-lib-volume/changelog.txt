@@ -1,0 +1,46 @@
+Release 1.0.0
+-------------
+* Added a snake case wrapper file: amx-lib-volume-sc.axi
+* Added volGetTouchPanelLevel() for sending volume on a level to a touch panel.
+* volToggleMute() returns the mute state after toggle.
+* volSetDimAmount() and volSetDimAmountAsByte() return sinteger.
+* Renamed dim functions to volDim() and volUndim() to avoid snake case naming
+    conflicts with constants.
+
+Release 0.2.0 RC1
+-----------------
+This version is a release candidate for v1.0.0.
+
+ATTENTION:
+Many function names have changed in this release, breaking backwards compatibility.
+
+If you are replacing a previous version of the library, the volGetLevel function
+has changed. See notes that follow.
+
+* Added the ability to dim volume levels with volDimOn and volDimOff.
+* volGetLevel has been renamed to volGetLevelPostMute.
+* volGetLevelPreMute has been renamed to volGetLevel.
+* volSetNumSteps has been renamed to volSetNumberOfSteps.
+* Array functions now start with "volArray...".
+* Array functions now return their parent function's error code, if any.
+* Setting min/max limits now return VOL_LIMITED if calling the function forced the
+other limit to be adjusted.
+* Other minor changes.
+
+
+Release 0.1.2
+-------------
+* Added volGetLevelPreMute(), volMuteToggle(), and volGetMuteState() functions.
+* Fixed bug with volIncrement() and volDecrement() not working when muted.
+
+
+Release 0.1.1
+-------------
+* Fixed bug which caused volInit() to skip reinitializing the step on an already initialized control.
+* Fixed bug causing a call to volSetMinAsByte() to do nothing.
+* Library passes unit tests.
+
+
+Release 0.1.0
+-------------
+* Initial alpha release, not fully tested.

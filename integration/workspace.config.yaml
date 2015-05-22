@@ -1,0 +1,6 @@
+systems:
+  -
+    name: amx-lib-netlinx-integration
+    connection: 10.0.5.20
+    includes:
+      - ../amx-lib-redis.axi

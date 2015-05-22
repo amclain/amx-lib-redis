@@ -1,0 +1,6 @@
+.yardoc/
+doc/
+\.src$
+\.tkn$
+\.tko$
+Gemfile.lock
