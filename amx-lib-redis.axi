@@ -122,6 +122,60 @@ define_function integer redis_set(dev socket, char key[], char value[])
 }
 
 /*
+ *  Subscribes the client to the specified channel.
+ *  http://redis.io/commands/subscribe
+ */
+define_function integer redis_subscribe(dev socket, char channel[])
+{
+    // TODO: Implement
+}
+
+/*
+ *  Subscribes the client to the given pattern.
+ *  http://redis.io/commands/psubscribe
+ */
+define_function integer redis_psubscribe(dev socket, char pattern[])
+{
+    // TODO: Implement
+}
+
+/*
+ *  Unsubscribes the client from the given channel.
+ *  http://redis.io/commands/unsubscribe
+ */
+define_function integer redis_unsubscribe(dev socket, char channel[])
+{
+    // TODO: Implement
+}
+
+/*
+ *  Unsubscribes the client from the given pattern.
+ *  http://redis.io/commands/punsubscribe
+ */
+define_function integer redis_punsubscribe(dev socket, char pattern[])
+{
+    // TODO: Implement
+}
+
+/*
+ *  Unsubscribes the client from all channels.
+ *  http://redis.io/commands/unsubscribe
+ */
+define_function integer redis_unsubscribe_all(dev socket)
+{
+    // TODO: Implement
+}
+
+/*
+ *  Posts a message to the given channel.
+ *  http://redis.io/commands/publish
+ */
+define_function integer redis_publish(dev socket, char channel[], char message[])
+{
+    // TODO: Implement
+}
+
+/*
  *  Returns true if packet is a bulk string.
  */
 define_function integer redis_is_bulk_string(char packet[])
