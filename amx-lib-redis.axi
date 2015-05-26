@@ -127,7 +127,16 @@ define_function integer redis_set(dev socket, char key[], char value[])
  */
 define_function integer redis_subscribe(dev socket, char channel[])
 {
-    // TODO: Implement
+    send_string socket, "
+        '*2', $0D, $0A,
+        '$9', $0D, $0A,
+        'subscribe', $0D, $0A,
+        '$', itoa(length_string(channel)), $0D, $0A,
+        channel, $0D, $0A
+    ";
+    
+    // TODO: Error handling.
+    return REDIS_SUCCESS;
 }
 
 /*
@@ -172,7 +181,18 @@ define_function integer redis_unsubscribe_all(dev socket)
  */
 define_function integer redis_publish(dev socket, char channel[], char message[])
 {
-    // TODO: Implement
+    send_string socket, "
+        '*3', $0D, $0A,
+        '$7', $0D, $0A,
+        'publish', $0D, $0A,
+        '$', itoa(length_string(channel)), $0D, $0A,
+        channel, $0D, $0A,
+        '$', itoa(length_string(message)), $0D, $0A,
+        message, $0D, $0A
+    ";
+    
+    // TODO: Error handling.
+    return REDIS_SUCCESS;
 }
 
 /*
@@ -180,6 +200,7 @@ define_function integer redis_publish(dev socket, char channel[], char message[]
  */
 define_function integer redis_is_bulk_string(char packet[])
 {
+    if (length_string(packet) < 1) { return false; }
     if (packet[1] == '$') { return true; }
     return false;
 }
@@ -193,7 +214,7 @@ define_function integer redis_parse_bulk_string(char packet[], char bulk_string[
 {
     integer pos;
     
-    if (redis_is_bulk_string(packet) == 0)
+    if (redis_is_bulk_string(packet) == false)
     {
         return REDIS_ERR_INCORRECT_TYPE; // Not bulk string.
     }
@@ -204,6 +225,61 @@ define_function integer redis_parse_bulk_string(char packet[], char bulk_string[
     // TODO: Test for nil.
     
     bulk_string = mid_string(packet, pos + 1, length_string(packet) - pos - 2);
+    return REDIS_SUCCESS;
+}
+
+/*
+ *  Returns true if packet is a pub/sub message.
+ */
+define_function integer redis_is_message(char packet[])
+{
+    char header[255];
+    header = "'*3', $0D, $0A, '$7', $0D, $0A, 'message', $0D, $0A";
+    
+    if (length_string(packet) <= length_string(header)) { return false; }
+    if (compare_string(left_string(packet, length_string(header)), header) == 0) { return false; }
+    
+    return true;
+}
+
+/*
+ *  Parses a pub/sub message from a response packet.
+ *  packet - Response from the server.
+ *  channel - Buffer to store the channel name.
+ *  message - Buffer to store the message.
+ */
+define_function integer redis_parse_message(char packet[], char channel[], char message[])
+{
+    integer start_pos, end_pos;
+    integer length;
+    
+    if (redis_is_message(packet) == false)
+    {
+        return REDIS_ERR_INCORRECT_TYPE; // Not pub/sub message.
+    }
+    
+    message = '';
+    print(LOG_LEVEL_DEBUG, 'set message blank');
+    start_pos = find_string(packet, '$', 18);
+    print(LOG_LEVEL_DEBUG, "'start pos: ', itoa(start_pos)");
+    end_pos = find_string(packet, "$0D", start_pos);
+    print(LOG_LEVEL_DEBUG, "'end pos: ', itoa(end_pos)");
+    
+    length = atoi(mid_string(packet, start_pos, end_pos - start_pos));
+    print(LOG_LEVEL_DEBUG, "'length: ', itoa(length)");
+    
+    channel = mid_string(packet, end_pos + 2, length);
+    
+    start_pos = find_string(packet, '$', end_pos + length + 4);
+    print(LOG_LEVEL_DEBUG, "'start pos: ', itoa(start_pos)");
+    end_pos = find_string(packet, "$0D", start_pos);
+    print(LOG_LEVEL_DEBUG, "'end pos: ', itoa(end_pos)");
+    
+    length = atoi(mid_string(packet, start_pos, end_pos - start_pos));
+    print(LOG_LEVEL_DEBUG, "'length: ', itoa(length)");
+    
+    message = mid_string(packet, end_pos + 2, length);
+    
     return REDIS_SUCCESS;
 }
 

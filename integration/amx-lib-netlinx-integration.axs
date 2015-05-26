@@ -44,13 +44,14 @@ DEFINE_START
 key = 'netlinx';
 
 logSetLevel(LOG_LEVEL_DEBUG);
+redis_connect(dvREDIS, REDIS_IP, REDIS_PORT);
 
 (***********************************************************)
 (*                   THE EVENTS GO BELOW                   *)
 (***********************************************************)
 DEFINE_EVENT
 
-button_event[dvDEBUG, 1]
+button_event[dvDEBUG, 100]
 {
     push:
     {
@@ -104,19 +105,51 @@ button_event[dvDEBUG, 4]
     release: {}
 }
 
+button_event[dvDEBUG, 5]
+{
+    push:
+    {
+        redis_publish(dvREDIS, 'whup', 'published by netlinx');
+        print(LOG_LEVEL_INFO, 'pub');
+    }
+    
+    release: {}
+}
+
+button_event[dvDEBUG, 6]
+{
+    push:
+    {
+        redis_subscribe(dvREDIS, 'whup2');
+        print(LOG_LEVEL_INFO, 'subscribed');
+    }
+    
+    release: {}
+}
+
 data_event[dvREDIS]
 {
     string:
     {
+        char channel[65535];
         char value[65535];
         
         print(LOG_LEVEL_DEBUG, "'REDIS: ', data.text");
         
-        if (redis_is_bulk_string(data.text))
-        {
-            redis_parse_bulk_string(data.text, value);
-            print(LOG_LEVEL_INFO, "'Value: ', value");
-        }
+        // if (redis_parse_bulk_string(data.text, value) == REDIS_SUCCESS)
+        // {
+        //     print(LOG_LEVEL_INFO, "'Value: ', value");
+        // }
+        // else if (redis_parse_message(data.text, channel, value) == REDIS_SUCCESS)
+        // {
+        //     print(LOG_LEVEL_DEBUG, 'pub/sub message received');
+        //     print(LOG_LEVEL_INFO, "'Value: ', value");
+        // }
+        
+        redis_parse_message(data.text, channel, value);
+        print(LOG_LEVEL_DEBUG, 'pub/sub message received');
+        print(LOG_LEVEL_INFO, "'Channel: ', channel");
+        print(LOG_LEVEL_INFO, "'Value: ', value");
     }
     
     command: {}
