@@ -109,7 +109,7 @@ button_event[dvDEBUG, 5]
 {
     push:
     {
-        redis_publish(dvREDIS, 'whup', 'published by netlinx');
+        redis_publish(dvREDIS, 'chan1', 'published by netlinx');
         print(LOG_LEVEL_INFO, 'pub');
     }
     
@@ -120,7 +120,7 @@ button_event[dvDEBUG, 6]
 {
     push:
     {
-        redis_subscribe(dvREDIS, 'whup2');
+        redis_subscribe(dvREDIS, 'chan2');
         print(LOG_LEVEL_INFO, 'subscribed');
     }
     

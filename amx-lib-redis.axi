@@ -89,16 +89,7 @@ define_function integer redis_connect(dev socket, char ip[], integer port)
  */
 define_function integer redis_get(dev socket, char key[])
 {
-    send_string socket, "
-        '*2', $0D, $0A,
-        '$3', $0D, $0A,
-        'get', $0D, $0A,
-        '$', itoa(length_string(key)), $0D, $0A,
-        key, $0D, $0A
-    ";
-    
-    // TODO: Error handling.
-    return REDIS_SUCCESS;
+    return _redis_send_command_2(socket, 'get', key);
 }
 
 /*
@@ -107,18 +98,7 @@ define_function integer redis_get(dev socket, char key[])
  */
 define_function integer redis_set(dev socket, char key[], char value[])
 {
-    send_string socket, "
-        '*3', $0D, $0A,
-        '$3', $0D, $0A,
-        'set', $0D, $0A,
-        '$', itoa(length_string(key)), $0D, $0A,
-        key, $0D, $0A,
-        '$', itoa(length_string(value)), $0D, $0A,
-        value, $0D, $0A
-    ";
-    
-    // TODO: Error handling.
-    return REDIS_SUCCESS;
+    return _redis_send_command_3(socket, 'set', key, value);
 }
 
 /*
@@ -127,16 +107,7 @@ define_function integer redis_set(dev socket, char key[], char value[])
  */
 define_function integer redis_subscribe(dev socket, char channel[])
 {
-    send_string socket, "
-        '*2', $0D, $0A,
-        '$9', $0D, $0A,
-        'subscribe', $0D, $0A,
-        '$', itoa(length_string(channel)), $0D, $0A,
-        channel, $0D, $0A
-    ";
-    
-    // TODO: Error handling.
-    return REDIS_SUCCESS;
+    return _redis_send_command_2(socket, 'subscribe', channel);
 }
 
 /*
@@ -181,18 +152,7 @@ define_function integer redis_unsubscribe_all(dev socket)
  */
 define_function integer redis_publish(dev socket, char channel[], char message[])
 {
-    send_string socket, "
-        '*3', $0D, $0A,
-        '$7', $0D, $0A,
-        'publish', $0D, $0A,
-        '$', itoa(length_string(channel)), $0D, $0A,
-        channel, $0D, $0A,
-        '$', itoa(length_string(message)), $0D, $0A,
-        message, $0D, $0A
-    ";
-    
-    // TODO: Error handling.
-    return REDIS_SUCCESS;
+    return _redis_send_command_3(socket, 'publish', channel, message);
 }
 
 /*
@@ -258,6 +218,64 @@ define_function integer redis_parse_message(char packet[], char channel[], char 
     message = '';
     pos = _redis_parse_string_frame(packet, channel, 18);
     pos = _redis_parse_string_frame(packet, message, pos + 1);
+    
+    return REDIS_SUCCESS;
+}
+
+/*
+ *  Send a command to the Redis server.
+ *  socket - TCP connection to the Redis server.
+ *  args - Array of strings to send.
+ */
+define_function integer _redis_send_command(dev socket, char args[][])
+{
+    integer i, len;
+    char packet[65535];
+    
+    packet = "'*', itoa(max_length_array(args)), $0D, $0A"; // Frame size.
+    
+    for (i = 1, len = max_length_array(args); i <= len; i++)
+    {
+        packet = "packet, '$', itoa(length_string(args[i])), $0D, $0A"; // String length.
+        packet = "packet, args[i], $0D, $0A"; // String content.
+    }
+    
+    send_string socket, packet;
+    return REDIS_SUCCESS;
+}
+
+/*
+ *  Send a command with two arguments to the Redis server.
+ *  Example: "get key"
+ */
+define_function integer _redis_send_command_2(dev socket, char arg1[], char arg2[])
+{
+    send_string socket, "
+        '*2', $0D, $0A,
+        '$', itoa(length_string(arg1)), $0D, $0A,
+        arg1, $0D, $0A,
+        '$', itoa(length_string(arg2)), $0D, $0A,
+        arg2, $0D, $0A
+    ";
+    
+    return REDIS_SUCCESS;
+}
+
+/*
+ *  Send a command with three arguments to the Redis server.
+ *  Example: "set key 10"
+ */
+define_function integer _redis_send_command_3(dev socket, char arg1[], char arg2[], char arg3[])
+{
+    send_string socket, "
+        '*3', $0D, $0A,
+        '$', itoa(length_string(arg1)), $0D, $0A,
+        arg1, $0D, $0A,
+        '$', itoa(length_string(arg2)), $0D, $0A,
+        arg2, $0D, $0A,
+        '$', itoa(length_string(arg3)), $0D, $0A,
+        arg3, $0D, $0A
+    ";
     
     return REDIS_SUCCESS;
 }

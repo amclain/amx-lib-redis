@@ -412,6 +412,15 @@ data_event[vdvRPC]
         // redis_parse_message(char packet[], char channel[], char message[])
 
         // Skipped:
+        // _redis_send_command(dev socket, char args[][])
+
+        // Skipped:
+        // _redis_send_command_2(dev socket, char arg1[], char arg2[])
+
+        // Skipped:
+        // _redis_send_command_3(dev socket, char arg1[], char arg2[], char arg3[])
+
+        // Skipped:
         // _redis_parse_string_frame(char packet[], char output[], long start)
 
     }
