@@ -411,6 +411,9 @@ data_event[vdvRPC]
         // Skipped:
         // redis_parse_message(char packet[], char channel[], char message[])
 
+        // Skipped:
+        // _redis_parse_string_frame(char packet[], char output[], long start)
+
     }
 }
 #end_if

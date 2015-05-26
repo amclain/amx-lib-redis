@@ -136,20 +136,17 @@ data_event[dvREDIS]
         
         print(LOG_LEVEL_DEBUG, "'REDIS: ', data.text");
         
-        // if (redis_parse_bulk_string(data.text, value) == REDIS_SUCCESS)
-        // {
-        //     print(LOG_LEVEL_INFO, "'Value: ', value");
-        // }
-        // else if (redis_parse_message(data.text, channel, value) == REDIS_SUCCESS)
-        // {
-        //     print(LOG_LEVEL_DEBUG, 'pub/sub message received');
-        //     print(LOG_LEVEL_INFO, "'Value: ', value");
-        // }
-        
-        redis_parse_message(data.text, channel, value);
-        print(LOG_LEVEL_DEBUG, 'pub/sub message received');
-        print(LOG_LEVEL_INFO, "'Channel: ', channel");
-        print(LOG_LEVEL_INFO, "'Value: ', value");
+        if (redis_parse_bulk_string(data.text, value) == REDIS_SUCCESS)
+        {
+            print(LOG_LEVEL_INFO, 'bulk string received');
+            print(LOG_LEVEL_INFO, "'Value: ', value");
+        }
+        else if (redis_parse_message(data.text, channel, value) == REDIS_SUCCESS)
+        {
+            print(LOG_LEVEL_INFO, 'pub/sub message received');
+            print(LOG_LEVEL_INFO, "'Channel: ', channel");
+            print(LOG_LEVEL_INFO, "'Value: ', value");
+        }
     }
     
     command: {}

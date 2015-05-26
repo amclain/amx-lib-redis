@@ -51,7 +51,7 @@ REDIS_DEFAULT_PORT = 6379;
 
 // Error codes.
 REDIS_SUCCESS = 0;
-REDIS_ERR_INCORRECT_TYPE = 0;
+REDIS_ERR_INCORRECT_TYPE = 1;
 
 (***********************************************************)
 (*                    INCLUDES GO BELOW                    *)
@@ -220,11 +220,8 @@ define_function integer redis_parse_bulk_string(char packet[], char bulk_string[
     }
     
     bulk_string = '';
-    pos = find_string(packet, "$0A", 1);
-    // TODO: Test return value for error.
-    // TODO: Test for nil.
+    pos = _redis_parse_string_frame(packet, bulk_string, 1);
     
-    bulk_string = mid_string(packet, pos + 1, length_string(packet) - pos - 2);
     return REDIS_SUCCESS;
 }
 
@@ -250,37 +247,39 @@ define_function integer redis_is_message(char packet[])
  */
 define_function integer redis_parse_message(char packet[], char channel[], char message[])
 {
-    integer start_pos, end_pos;
-    integer length;
+    integer pos;
     
     if (redis_is_message(packet) == false)
     {
         return REDIS_ERR_INCORRECT_TYPE; // Not pub/sub message.
     }
     
+    channel = '';
     message = '';
-    print(LOG_LEVEL_DEBUG, 'set message blank');
-    start_pos = find_string(packet, '$', 18);
-    print(LOG_LEVEL_DEBUG, "'start pos: ', itoa(start_pos)");
-    end_pos = find_string(packet, "$0D", start_pos);
-    print(LOG_LEVEL_DEBUG, "'end pos: ', itoa(end_pos)");
-    
-    length = atoi(mid_string(packet, start_pos, end_pos - start_pos));
-    print(LOG_LEVEL_DEBUG, "'length: ', itoa(length)");
-    
-    channel = mid_string(packet, end_pos + 2, length);
-    
-    start_pos = find_string(packet, '$', end_pos + length + 4);
-    print(LOG_LEVEL_DEBUG, "'start pos: ', itoa(start_pos)");
-    end_pos = find_string(packet, "$0D", start_pos);
-    print(LOG_LEVEL_DEBUG, "'end pos: ', itoa(end_pos)");
-    
-    length = atoi(mid_string(packet, start_pos, end_pos - start_pos));
-    print(LOG_LEVEL_DEBUG, "'length: ', itoa(length)");
-    
-    message = mid_string(packet, end_pos + 2, length);
+    pos = _redis_parse_string_frame(packet, channel, 18);
+    pos = _redis_parse_string_frame(packet, message, pos + 1);
     
     return REDIS_SUCCESS;
+}
+
+/*
+ *  Parses a string from a Redis response packet.
+ *  packet - Response from the server.
+ *  output - Buffer to hold the parsed string.
+ *  start - Offset to start parsing.
+ *  Returns the position of the last byte of the frame.
+ */
+define_function integer _redis_parse_string_frame(char packet[], char output[], long start)
+{
+    integer start_pos, end_pos, length;
+    
+    output = '';
+    start_pos = find_string(packet, '$', start);
+    end_pos = find_string(packet, "$0D", start_pos);
+    length = atoi(mid_string(packet, start_pos, end_pos - start_pos));
+    output = mid_string(packet, end_pos + 2, length);
+    
+    return end_pos + length + 3;
 }
 
 (***********************************************************)
