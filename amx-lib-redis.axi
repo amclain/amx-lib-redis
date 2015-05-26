@@ -165,16 +165,6 @@ define_function integer redis_publish(dev socket, char channel[], char message[]
 }
 
 /*
- *  Returns true if packet is a bulk string.
- */
-define_function integer redis_is_bulk_string(char packet[])
-{
-    if (length_string(packet) < 1) { return false; }
-    if (packet[1] == '$') { return true; }
-    return false;
-}
-
-/*
  *  Parses a bulk string from a response packet.
  *  packet is the response from the server.
  *  bulk_string is the buffer to store the value.
@@ -183,7 +173,7 @@ define_function integer redis_parse_bulk_string(char packet[], char bulk_string[
 {
     integer pos;
     
-    if (redis_is_bulk_string(packet) == false)
+    if (length_string(packet) < 1 || packet[1] != '$')
     {
         return REDIS_ERR_INCORRECT_TYPE; // Not bulk string.
     }
@@ -195,20 +185,6 @@ define_function integer redis_parse_bulk_string(char packet[], char bulk_string[
 }
 
 /*
- *  Returns true if packet is a pub/sub message.
- */
-define_function integer redis_is_message(char packet[])
-{
-    char header[255];
-    header = "'*3', $0D, $0A, '$7', $0D, $0A, 'message', $0D, $0A";
-    
-    if (length_string(packet) <= length_string(header)) { return false; }
-    if (compare_string(left_string(packet, length_string(header)), header) == 0) { return false; }
-    
-    return true;
-}
-
-/*
  *  Parses a pub/sub message from a response packet.
  *  packet - Response from the server.
  *  channel - Buffer to store the channel name.
@@ -217,8 +193,14 @@ define_function integer redis_is_message(char packet[])
 define_function integer redis_parse_message(char packet[], char channel[], char message[])
 {
     integer pos;
+    char header[255];
     
-    if (redis_is_message(packet) == false)
+    header = "'*3', $0D, $0A, '$7', $0D, $0A, 'message', $0D, $0A";
+    
+    if (
+        length_string(packet) <= length_string(header) ||
+        compare_string(left_string(packet, length_string(header)), header) == 0
+    )
     {
         return REDIS_ERR_INCORRECT_TYPE; // Not pub/sub message.
     }
