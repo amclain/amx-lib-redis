@@ -391,10 +391,13 @@ data_event[vdvRPC]
         // redis_unsubscribe(dev socket, char channel[])
 
         // Skipped:
+        // redis_unsubscribe_all(dev socket)
+
+        // Skipped:
         // redis_punsubscribe(dev socket, char pattern[])
 
         // Skipped:
-        // redis_unsubscribe_all(dev socket)
+        // redis_punsubscribe_all(dev socket)
 
         // Skipped:
         // redis_publish(dev socket, char channel[], char message[])
@@ -413,6 +416,9 @@ data_event[vdvRPC]
 
         // Skipped:
         // _redis_send_command(dev socket, char args[][])
+
+        // Skipped:
+        // _redis_send_command_1(dev socket, char arg1[])
 
         // Skipped:
         // _redis_send_command_2(dev socket, char arg1[], char arg2[])

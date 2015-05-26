@@ -127,6 +127,28 @@ button_event[dvDEBUG, 6]
     release: {}
 }
 
+button_event[dvDEBUG, 7]
+{
+    push:
+    {
+        redis_psubscribe(dvREDIS, 'chan*');
+        print(LOG_LEVEL_INFO, 'subscribed to chan*');
+    }
+    
+    release: {}
+}
+
+button_event[dvDEBUG, 8]
+{
+    push:
+    {
+        redis_punsubscribe_all(dvREDIS);
+        print(LOG_LEVEL_INFO, 'unsubscribed from all channels');
+    }
+    
+    release: {}
+}
+
 data_event[dvREDIS]
 {
     string:

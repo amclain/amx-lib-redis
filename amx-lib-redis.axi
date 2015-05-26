@@ -116,7 +116,7 @@ define_function integer redis_subscribe(dev socket, char channel[])
  */
 define_function integer redis_psubscribe(dev socket, char pattern[])
 {
-    // TODO: Implement
+    return _redis_send_command_2(socket, 'psubscribe', pattern);
 }
 
 /*
@@ -125,16 +125,7 @@ define_function integer redis_psubscribe(dev socket, char pattern[])
  */
 define_function integer redis_unsubscribe(dev socket, char channel[])
 {
-    // TODO: Implement
-}
-
-/*
- *  Unsubscribes the client from the given pattern.
- *  http://redis.io/commands/punsubscribe
- */
-define_function integer redis_punsubscribe(dev socket, char pattern[])
-{
-    // TODO: Implement
+    return _redis_send_command_2(socket, 'unsubscribe', channel);
 }
 
 /*
@@ -143,7 +134,25 @@ define_function integer redis_punsubscribe(dev socket, char pattern[])
  */
 define_function integer redis_unsubscribe_all(dev socket)
 {
-    // TODO: Implement
+    return _redis_send_command_1(socket, 'unsubscribe');
+}
+
+/*
+ *  Unsubscribes the client from the given pattern.
+ *  http://redis.io/commands/punsubscribe
+ */
+define_function integer redis_punsubscribe(dev socket, char pattern[])
+{
+    return _redis_send_command_2(socket, 'punsubscribe', pattern);
+}
+
+/*
+ *  Unsubscribes the client from all patterns.
+ *  http://redis.io/commands/punsubscribe
+ */
+define_function integer redis_punsubscribe_all(dev socket)
+{
+    return _redis_send_command_1(socket, 'punsubscribe');
 }
 
 /*
@@ -241,6 +250,21 @@ define_function integer _redis_send_command(dev socket, char args[][])
     }
     
     send_string socket, packet;
+    return REDIS_SUCCESS;
+}
+
+/*
+ *  Send a command with one argument to the Redis server.
+ *  Example: "unsubscribe"
+ */
+define_function integer _redis_send_command_1(dev socket, char arg1[])
+{
+    send_string socket, "
+        '*1', $0D, $0A,
+        '$', itoa(length_string(arg1)), $0D, $0A,
+        arg1, $0D, $0A
+    ";
+    
     return REDIS_SUCCESS;
 }
 
