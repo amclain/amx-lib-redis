@@ -217,11 +217,13 @@ define_function integer redis_parse_message(char packet[], char channel[], char 
  *  Send a command to the Redis server.
  *  socket - TCP connection to the Redis server.
  *  args - Array of strings to send.
+ *  
+ *  Note: send_string can only transmit 16,000 bytes.
  */
 define_function integer _redis_send_command(dev socket, char args[][])
 {
     integer i, len;
-    char packet[65535];
+    char packet[16000]; // send_string can only transmit 16,000 bytes.
     
     packet = "'*', itoa(max_length_array(args)), $0D, $0A"; // Frame size.
     
