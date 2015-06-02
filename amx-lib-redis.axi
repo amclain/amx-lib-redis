@@ -194,23 +194,42 @@ define_function integer redis_parse_message(char packet[], char channel[], char 
 {
     integer pos;
     char header[255];
+    char trash[255];
     
+    // Check for standard message.
     header = "'*3', $0D, $0A, '$7', $0D, $0A, 'message', $0D, $0A";
     
     if (
-        length_string(packet) <= length_string(header) ||
-        compare_string(left_string(packet, length_string(header)), header) == 0
+        length_string(packet) > length_string(header) &&
+        compare_string(left_string(packet, length_string(header)), header) == 1
     )
     {
-        return REDIS_ERR_INCORRECT_TYPE; // Not pub/sub message.
+        channel = '';
+        message = '';
+        pos = _redis_parse_string_frame(packet, channel, length_string(header) + 1);
+        pos = _redis_parse_string_frame(packet, message, pos + 1);
+        
+        return REDIS_SUCCESS;
     }
     
-    channel = '';
-    message = '';
-    pos = _redis_parse_string_frame(packet, channel, 18);
-    pos = _redis_parse_string_frame(packet, message, pos + 1);
+    // Check for pmessage.
+    header = "'*4', $0D, $0A, '$8', $0D, $0A, 'pmessage', $0D, $0A";
     
-    return REDIS_SUCCESS;
+    if (
+        length_string(packet) > length_string(header) &&
+        compare_string(left_string(packet, length_string(header)), header) == 1
+    )
+    {
+        channel = '';
+        message = '';
+        pos = _redis_parse_string_frame(packet, trash, length_string(header) + 1); // Throw away subscription pattern.
+        pos = _redis_parse_string_frame(packet, channel, pos + 1);
+        pos = _redis_parse_string_frame(packet, message, pos + 1);
+        
+        return REDIS_SUCCESS;
+    }
+    
+    return REDIS_ERR_INCORRECT_TYPE; // Not pub/sub message.
 }
 
 /*
