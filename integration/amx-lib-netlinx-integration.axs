@@ -149,6 +149,31 @@ button_event[dvDEBUG, 8]
     release: {}
 }
 
+button_event[dvDEBUG, 9]
+{
+    push:
+    {
+        redis_watch(dvREDIS, 'watched_key');
+        print(LOG_LEVEL_INFO, 'watching key');
+    }
+    
+    release: {}
+}
+
+button_event[dvDEBUG, 10]
+{
+    push:
+    {
+        redis_multi(dvREDIS);
+        redis_set(dvREDIS, 'watched_key', '10');
+        redis_exec(dvREDIS);
+        
+        print(LOG_LEVEL_INFO, 'executed transaction');
+    }
+    
+    release: {}
+}
+
 data_event[dvREDIS]
 {
     string:

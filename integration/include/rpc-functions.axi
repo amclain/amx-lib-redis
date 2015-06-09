@@ -403,6 +403,21 @@ data_event[vdvRPC]
         // redis_publish(dev socket, char channel[], char message[])
 
         // Skipped:
+        // redis_multi(dev socket)
+
+        // Skipped:
+        // redis_exec(dev socket)
+
+        // Skipped:
+        // redis_discard(dev socket)
+
+        // Skipped:
+        // redis_watch(dev socket, char key[])
+
+        // Skipped:
+        // redis_unwatch(dev socket)
+
+        // Skipped:
         // redis_parse_bulk_string(char packet[], char bulk_string[])
 
         // Skipped:

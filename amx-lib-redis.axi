@@ -89,7 +89,7 @@ define_function integer redis_connect(dev socket, char ip[], integer port)
  */
 define_function integer redis_get(dev socket, char key[])
 {
-    return _redis_send_command_2(socket, 'get', key);
+    return _redis_send_command_2(socket, 'GET', key);
 }
 
 /*
@@ -98,7 +98,7 @@ define_function integer redis_get(dev socket, char key[])
  */
 define_function integer redis_set(dev socket, char key[], char value[])
 {
-    return _redis_send_command_3(socket, 'set', key, value);
+    return _redis_send_command_3(socket, 'SET', key, value);
 }
 
 /*
@@ -107,7 +107,7 @@ define_function integer redis_set(dev socket, char key[], char value[])
  */
 define_function integer redis_subscribe(dev socket, char channel[])
 {
-    return _redis_send_command_2(socket, 'subscribe', channel);
+    return _redis_send_command_2(socket, 'SUBSCRIBE', channel);
 }
 
 /*
@@ -116,7 +116,7 @@ define_function integer redis_subscribe(dev socket, char channel[])
  */
 define_function integer redis_psubscribe(dev socket, char pattern[])
 {
-    return _redis_send_command_2(socket, 'psubscribe', pattern);
+    return _redis_send_command_2(socket, 'PSUBSCRIBE', pattern);
 }
 
 /*
@@ -125,7 +125,7 @@ define_function integer redis_psubscribe(dev socket, char pattern[])
  */
 define_function integer redis_unsubscribe(dev socket, char channel[])
 {
-    return _redis_send_command_2(socket, 'unsubscribe', channel);
+    return _redis_send_command_2(socket, 'UNSUBSCRIBE', channel);
 }
 
 /*
@@ -134,7 +134,7 @@ define_function integer redis_unsubscribe(dev socket, char channel[])
  */
 define_function integer redis_unsubscribe_all(dev socket)
 {
-    return _redis_send_command_1(socket, 'unsubscribe');
+    return _redis_send_command_1(socket, 'UNSUBSCRIBE');
 }
 
 /*
@@ -143,7 +143,7 @@ define_function integer redis_unsubscribe_all(dev socket)
  */
 define_function integer redis_punsubscribe(dev socket, char pattern[])
 {
-    return _redis_send_command_2(socket, 'punsubscribe', pattern);
+    return _redis_send_command_2(socket, 'PUNSUBSCRIBE', pattern);
 }
 
 /*
@@ -152,7 +152,7 @@ define_function integer redis_punsubscribe(dev socket, char pattern[])
  */
 define_function integer redis_punsubscribe_all(dev socket)
 {
-    return _redis_send_command_1(socket, 'punsubscribe');
+    return _redis_send_command_1(socket, 'PUNSUBSCRIBE');
 }
 
 /*
@@ -161,7 +161,57 @@ define_function integer redis_punsubscribe_all(dev socket)
  */
 define_function integer redis_publish(dev socket, char channel[], char message[])
 {
-    return _redis_send_command_3(socket, 'publish', channel, message);
+    return _redis_send_command_3(socket, 'PUBLISH', channel, message);
+}
+
+/*
+ *  Marks the start of a transaction block. Subsequent commands will be queued
+ *  for atomic execution using EXEC.
+ *  http://redis.io/commands/multi
+ */
+define_function integer redis_multi(dev socket)
+{
+    return _redis_send_command_1(socket, 'MULTI');
+}
+
+/*
+ *  Executes all previously queued commands in a transaction and restores the
+ *  connection state to normal.
+ *  http://redis.io/commands/exec
+ */
+define_function integer redis_exec(dev socket)
+{
+    return _redis_send_command_1(socket, 'EXEC');
+}
+
+/*
+ *  Flushes all previously queued commands in a transaction and restores the
+ *  connection state to normal. If WATCH was used, DISCARD unwatches all keys
+ *  watched by the connection.
+ *  http://redis.io/commands/discard
+ */
+define_function integer redis_discard(dev socket)
+{
+    return _redis_send_command_1(socket, 'DISCARD');
+}
+
+/*
+ *  Marks the given keys to be watched for conditional execution of a transaction.
+ *  http://redis.io/commands/watch
+ */
+define_function integer redis_watch(dev socket, char key[])
+{
+    return _redis_send_command_2(socket, 'WATCH', key);
+}
+
+/*
+ *  Flushes all the previously watched keys for a transaction.
+ *  If you call EXEC or DISCARD, there's no need to manually call UNWATCH.
+ *  http://redis.io/commands/unwatch
+ */
+define_function integer redis_unwatch(dev socket)
+{
+    return _redis_send_command_1(socket, 'UNWATCH');
 }
 
 /*
