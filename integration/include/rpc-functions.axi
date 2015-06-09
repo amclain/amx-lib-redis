@@ -418,6 +418,15 @@ data_event[vdvRPC]
         // redis_unwatch(dev socket)
 
         // Skipped:
+        // redis_parse_ok(char packet[])
+
+        // Skipped:
+        // redis_parse_nil(char packet[])
+
+        // Skipped:
+        // redis_parse_queued(char packet[])
+
+        // Skipped:
         // redis_parse_bulk_string(char packet[], char bulk_string[])
 
         // Skipped:

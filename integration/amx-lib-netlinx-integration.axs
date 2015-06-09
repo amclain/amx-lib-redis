@@ -194,6 +194,18 @@ data_event[dvREDIS]
             print(LOG_LEVEL_INFO, "'Channel: ', channel");
             print(LOG_LEVEL_INFO, "'Value: ', value");
         }
+        else if (redis_parse_ok(data.text) == REDIS_SUCCESS)
+        {
+            print(LOG_LEVEL_INFO, 'REDIS: OK');
+        }
+        else if (redis_parse_nil(data.text) == REDIS_SUCCESS)
+        {
+            print(LOG_LEVEL_INFO, 'REDIS: (nil)');
+        }
+        else if (redis_parse_queued(data.text) == REDIS_SUCCESS)
+        {
+            print(LOG_LEVEL_INFO, 'REDIS: Queued');
+        }
     }
     
     command: {}

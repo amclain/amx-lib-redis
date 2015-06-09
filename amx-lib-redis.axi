@@ -215,9 +215,54 @@ define_function integer redis_unwatch(dev socket)
 }
 
 /*
+ *  Parses an OK response packet.
+ *  packet - Response from the server.
+ */
+define_function integer redis_parse_ok(char packet[])
+{
+    if (
+        compare_string(packet, "'+OK', $0D, $0A") == 1 ||
+        compare_string(packet, "'*1', $0D, $0A, '+OK', $0D, $0A") == 1
+    )
+    {
+        return REDIS_SUCCESS;
+    }
+    
+    return REDIS_ERR_INCORRECT_TYPE;
+}
+
+/*
+ *  Parses a nil response packet.
+ *  packet - Response from the server.
+ */
+define_function integer redis_parse_nil(char packet[])
+{
+    if (compare_string(packet, "'*-1', $0D, $0A") == 1)
+    {
+        return REDIS_SUCCESS;
+    }
+    
+    return REDIS_ERR_INCORRECT_TYPE;
+}
+
+/*
+ *  Parses a QUEUED response packet.
+ *  packet - Response from the server.
+ */
+define_function integer redis_parse_queued(char packet[])
+{
+    if (compare_string(packet, "'+QUEUED', $0D, $0A") == 1)
+    {
+        return REDIS_SUCCESS;
+    }
+    
+    return REDIS_ERR_INCORRECT_TYPE;
+}
+
+/*
  *  Parses a bulk string from a response packet.
- *  packet is the response from the server.
- *  bulk_string is the buffer to store the value.
+ *  packet - Response from the server.
+ *  bulk_string - Buffer to store the value.
  */
 define_function integer redis_parse_bulk_string(char packet[], char bulk_string[])
 {
