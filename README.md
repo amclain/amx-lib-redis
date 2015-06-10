@@ -125,3 +125,18 @@ data_event[dvREDIS]
     }
 }
 ```
+
+
+### Transactions
+
+This library provides functions that can be used to perform [transactions](http://redis.io/topics/transactions):
+
+```netlinx
+redis_watch(dvREDIS, 'watched_key');
+
+redis_multi(dvREDIS);
+redis_set(dvREDIS, 'watched_key', '10');
+redis_exec(dvREDIS);
+```
+
+
