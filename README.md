@@ -140,3 +140,46 @@ redis_exec(dvREDIS);
 ```
 
 
+### Pub/Sub Messaging
+
+This library supports the Redis [publish/subscribe messaging paradigm](http://redis.io/topics/pubsub).
+The following code publishes a message to a channel named `chan1`:
+
+```netlinx
+redis_publish(dvREDIS, 'chan1', 'Published from master controller.');
+```
+
+This library also supports [subscribing to a channel](http://redis.io/commands/subscribe),
+or [subscribing to a pattern](http://redis.io/commands/psubscribe) of channel names:
+
+```netlinx
+// Subscribe to a channel:
+redis_subscribe(dvREDIS, 'chan2');
+// or subscribe to a pattern:
+redis_psubscribe(dvREDIS, 'chan*');
+```
+
+Incoming messages can be handled with the `redis_parse_message()` function:
+
+```netlinx
+(***********************************************************)
+(*                   THE EVENTS GO BELOW                   *)
+(***********************************************************)
+DEFINE_EVENT
+
+data_event[dvREDIS]
+{
+    string:
+    {
+        char channel[65535];
+        char value[65535];
+        
+        if (redis_parse_message(data.text, channel, value) == REDIS_SUCCESS)
+        {
+            send_string 0, 'pub/sub message received';
+            send_string 0, "'Channel: ', channel";
+            send_string 0, "'Value: ', value";
+        }
+    }
+}
+```
