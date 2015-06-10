@@ -33,3 +33,46 @@ https://github.com/amclain/amx-lib-redis/issues
 
 Mercurial users can use [Hg-Git](http://hg-git.github.io/) to interact with
 GitHub repositories.
+
+
+## Usage
+
+### Setting Up A Connection
+
+This library supports multiple connections to Redis databases, and therefore
+lets the control system developer decide what connections are needed in a
+system. In this example `dvREDIS` is used for sending commands to a single
+database. Additional devices could be added to connect to other databases,
+or used for [pub/sub messaging](http://redis.io/topics/pubsub). Due to the
+support for multiple connections, library functions typically take a Redis
+device as the first argument.
+
+```netlinx
+(***********************************************************)
+(*           DEVICE NUMBER DEFINITIONS GO BELOW            *)
+(***********************************************************)
+DEFINE_DEVICE
+
+dvREDIS = 0:2:0;
+
+(***********************************************************)
+(*                    INCLUDES GO BELOW                    *)
+(***********************************************************)
+
+#include 'amx-lib-redis'
+
+(***********************************************************)
+(*              CONSTANT DEFINITIONS GO BELOW              *)
+(***********************************************************)
+DEFINE_CONSTANT
+
+REDIS_IP   = '192.168.1.2';
+REDIS_PORT = REDIS_DEFAULT_PORT;
+
+(***********************************************************)
+(*                 STARTUP CODE GOES BELOW                 *)
+(***********************************************************)
+DEFINE_START
+
+redis_connect(dvREDIS, REDIS_IP, REDIS_PORT);
+```
