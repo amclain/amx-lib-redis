@@ -37,6 +37,11 @@ GitHub repositories.
 
 ## Usage
 
+Note: NetLinx `send_string` is limited to a maximum of 16,000 bytes. Due to
+this, data sent to a Redis connection must be lower than this limit, *including
+the Redis protocol overhead*. It is advised to keep data passed to library
+functions well below this limit.
+
 ### Setting Up A Connection
 
 This library supports multiple connections to Redis databases, and therefore
@@ -75,4 +80,48 @@ REDIS_PORT = REDIS_DEFAULT_PORT;
 DEFINE_START
 
 redis_connect(dvREDIS, REDIS_IP, REDIS_PORT);
+```
+
+
+### Getting And Setting Values
+
+Setting the value for a Redis key is pretty straightforward:
+
+```netlinx
+redis_set(dvREDIS, 'test_key', 'hello world');
+```
+
+Getting a value is more complicated due to the asynchronous nature of the
+connection and how NetLinx handles socket events. This library provides a
+minimalistic approach for this implementation; your specific project may require
+adding a buffer, queue, or state machine.
+
+Helper functions like `redis_parse_bulk_string()` are provided to assist in
+parsing responses from the Redis server, and return the constant `REDIS_SUCCESS`
+if they were able to process the response. Since these helper functions are
+capable of performing their own checks on the data, it is possible to set up a
+chain of `redis_parse` functions and test for which one succeeds.
+
+```netlinx
+redis_get(dvREDIS, 'test_key');
+```
+
+```netlinx
+(***********************************************************)
+(*                   THE EVENTS GO BELOW                   *)
+(***********************************************************)
+DEFINE_EVENT
+
+data_event[dvREDIS]
+{
+    string:
+    {
+        char value[65535];
+        
+        if (redis_parse_bulk_string(data.text, value) == REDIS_SUCCESS)
+        {
+            // Process the string stored in `value`.
+        }
+    }
+}
 ```
